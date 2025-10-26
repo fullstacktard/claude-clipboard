@@ -1,7 +1,13 @@
 # Clipboard Image Watcher for Claude Code
 # Automatically saves clipboard images when they change
 
-$cachePath = "\\wsl.localhost\Ubuntu\home\fullstacktard\.cache\claude-clipboard-images"
+# Get WSL home directory dynamically
+$wslHome = (wsl bash -c 'echo $HOME' 2>$null).Trim()
+if ([string]::IsNullOrEmpty($wslHome)) {
+    Write-Error "Could not determine WSL home directory"
+    exit 1
+}
+$cachePath = "\\wsl.localhost\Ubuntu$wslHome\.cache\claude-clipboard-images"
 New-Item -ItemType Directory -Force -Path $cachePath | Out-Null
 
 $imageCounter = 1

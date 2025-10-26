@@ -14,8 +14,8 @@ Get-Process | Where-Object {
 
 Start-Sleep -Milliseconds 500
 
-# Path to our script
-$scriptPath = "C:\Users\fullstacktard\Documents\development\claude-code-notifier\claude-paste-smart.ahk"
+# Path to our script (in current directory)
+$scriptPath = Join-Path $PSScriptRoot "claude-smart-paste.ahk"
 
 if (Test-Path $scriptPath) {
     # Try to find AutoHotkey v2

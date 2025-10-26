@@ -16,8 +16,8 @@ Get-CimInstance Win32_Process -Filter "name = 'AutoHotkey64.exe' OR name = 'Auto
 # Wait a moment
 Start-Sleep -Milliseconds 500
 
-# Start the new smart paste script
-$scriptPath = "\\wsl.localhost\Ubuntu\home\fullstacktard\development\claude-wsl\autohotkey\claude-smart-paste.ahk"
+# Start the new smart paste script (from current directory)
+$scriptPath = Join-Path $PSScriptRoot "claude-smart-paste.ahk"
 
 if (Test-Path $scriptPath) {
     # Try to find AutoHotkey v2

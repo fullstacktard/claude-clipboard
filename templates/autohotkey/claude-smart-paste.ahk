@@ -26,7 +26,9 @@ PasteClipboardImage() {
                 FileDelete(tempFile)
 
             ; Run WSL script and save output to file (use C:\ as working dir to avoid UNC path issues)
-            RunWait('cmd.exe /c wsl bash /home/fullstacktard/development/claude-wsl/clipboard/claude-paste-image > "' . tempFile . '" 2>&1', "C:\", "Hide")
+            ; Script path will be set during installation
+            scriptPath := "$HOME/.local/share/claude-clipboard/claude-paste-image"
+            RunWait('cmd.exe /c wsl bash -c "' . scriptPath . '" > "' . tempFile . '" 2>&1', "C:\", "Hide")
 
             ; Read result
             if FileExist(tempFile) {
