@@ -257,5 +257,4 @@ Built by [@fullstacktard](https://github.com/fullstacktard) - because saving scr
 
 ## Related
 
-- [claude-wsl-integration](https://www.npmjs.com/package/claude-wsl-integration) - Visual notifications for Claude Code
 - [claude-workflow](https://www.npmjs.com/package/claude-workflow) - Workflow management for Claude Code

@@ -1,54 +1,51 @@
-# Start Ctrl+Shift+V paste system for Claude Code
+# Create startup shortcut for Claude Clipboard
+# This creates a shortcut that runs on Windows login
 
-$ErrorActionPreference = "SilentlyContinue"
+$ErrorActionPreference = "Stop"
 
-# Kill any existing AutoHotkey processes
-Get-Process | Where-Object {
-    $_.ProcessName -like "*AutoHotkey*"
-} | ForEach-Object {
-    try {
-        $_.Kill()
-        Start-Sleep -Milliseconds 100
-    } catch {}
+# Get the Windows Startup folder
+$startupFolder = [Environment]::GetFolderPath("Startup")
+
+# Path to our start script (in current directory)
+$startScriptPath = Join-Path $PSScriptRoot "start-smart-paste.ps1"
+
+if (-not (Test-Path $startScriptPath)) {
+    Write-Host "ERROR: Start script not found at $startScriptPath"
+    exit 1
 }
 
-Start-Sleep -Milliseconds 500
+# Find AutoHotkey v2 executable
+$ahkPaths = @(
+    "C:\Program Files\AutoHotkey\v2\AutoHotkey64.exe",
+    "C:\Program Files\AutoHotkey\v2\AutoHotkey.exe",
+    "C:\Program Files (x86)\AutoHotkey\v2\AutoHotkey64.exe",
+    "C:\Program Files (x86)\AutoHotkey\v2\AutoHotkey.exe",
+    "C:\Program Files\AutoHotkey\AutoHotkey64.exe",
+    "C:\Program Files\AutoHotkey\AutoHotkey.exe"
+)
 
-# Path to our script (in current directory)
-$scriptPath = Join-Path $PSScriptRoot "claude-smart-paste.ahk"
+$ahkExe = $ahkPaths | Where-Object { Test-Path $_ } | Select-Object -First 1
 
-if (Test-Path $scriptPath) {
-    # Try to find AutoHotkey v2
-    $ahkPaths = @(
-        "C:\Program Files\AutoHotkey\v2\AutoHotkey64.exe",
-        "C:\Program Files\AutoHotkey\v2\AutoHotkey.exe",
-        "C:\Program Files (x86)\AutoHotkey\v2\AutoHotkey64.exe",
-        "C:\Program Files (x86)\AutoHotkey\v2\AutoHotkey.exe",
-        "C:\Program Files\AutoHotkey\AutoHotkey64.exe",
-        "C:\Program Files\AutoHotkey\AutoHotkey.exe"
-    )
-
-    $ahkExe = $ahkPaths | Where-Object { Test-Path $_ } | Select-Object -First 1
-
-    if ($ahkExe) {
-        Start-Process -FilePath $ahkExe -ArgumentList "`"$scriptPath`"" -WindowStyle Hidden
-        Write-Host "SUCCESS: Ctrl+Shift+V is ready!"
-        Write-Host ""
-        Write-Host "Usage:"
-        Write-Host "  1. Take screenshot (Win+Shift+S)"
-        Write-Host "  2. Press Ctrl+Shift+V in Claude Code"
-        Write-Host "  3. Screenshot appears!"
-        Write-Host "  4. Repeat for more screenshots"
-        Write-Host ""
-        Write-Host "Each screenshot will be labeled [Image 1], [Image 2], etc."
-    } else {
-        Write-Host "ERROR: AutoHotkey not found!"
-        Write-Host ""
-        Write-Host "Please install AutoHotkey:"
-        Write-Host "  Download: https://www.autohotkey.com/download/ahk-v2.exe"
-        Write-Host ""
-        Write-Host "After installing, run this command again."
-    }
-} else {
-    Write-Host "ERROR: Script not found at $scriptPath"
+if (-not $ahkExe) {
+    Write-Host "ERROR: AutoHotkey not found!"
+    Write-Host "Please install from: https://www.autohotkey.com/"
+    exit 1
 }
+
+# Create shortcut that runs PowerShell script
+$shortcutPath = Join-Path $startupFolder "Claude-Smart-Paste.lnk"
+$WScriptShell = New-Object -ComObject WScript.Shell
+$shortcut = $WScriptShell.CreateShortcut($shortcutPath)
+$shortcut.TargetPath = "powershell.exe"
+$shortcut.Arguments = "-ExecutionPolicy Bypass -WindowStyle Hidden -File `"$startScriptPath`""
+$shortcut.WorkingDirectory = $PSScriptRoot
+$shortcut.Description = "Claude Code Smart Clipboard Paste (Ctrl+V)"
+$shortcut.WindowStyle = 7  # Minimized
+$shortcut.Save()
+
+Write-Host "SUCCESS! Startup shortcut created."
+Write-Host "Shortcut: $shortcutPath"
+Write-Host ""
+Write-Host "Clipboard paste will now start automatically on login."
+Write-Host ""
+Write-Host "To uninstall, delete: $shortcutPath"

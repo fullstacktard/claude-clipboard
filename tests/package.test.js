@@ -35,7 +35,6 @@ describe("Template Files", () => {
   const templateDirs = [
     "templates/clipboard",
     "templates/autohotkey",
-    "templates/assets",
   ];
 
   templateDirs.forEach((dir) => {
@@ -70,15 +69,6 @@ describe("Template Files", () => {
     ahkScripts.forEach((script) => {
       const scriptPath = path.join(rootDir, "templates/autohotkey", script);
       expect(existsSync(scriptPath)).toBe(true);
-    });
-  });
-
-  it("should have asset files", () => {
-    const assets = ["claude-icon.png", "claude-icon.ico"];
-
-    assets.forEach((asset) => {
-      const assetPath = path.join(rootDir, "templates/assets", asset);
-      expect(existsSync(assetPath)).toBe(true);
     });
   });
 });
