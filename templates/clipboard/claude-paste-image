@@ -1,0 +1,79 @@
+#!/bin/bash
+# Claude Code WSL Clipboard Image Paste Script
+# This script checks Windows clipboard for images and saves them to a temp location
+
+# Create temp directory if it doesn't exist
+TEMP_DIR="${HOME}/.cache/claude-clipboard-images"
+mkdir -p "$TEMP_DIR"
+
+# Counter file to track image numbers per session
+COUNTER_FILE="${TEMP_DIR}/.image_counter"
+
+# Reset counter if it's from a different Claude Code session
+# We detect a new session if the counter file is older than 2 minutes
+if [ -f "$COUNTER_FILE" ]; then
+    # Get age of counter file in seconds
+    CURRENT_TIME=$(date +%s)
+    FILE_TIME=$(stat -c %Y "$COUNTER_FILE" 2>/dev/null || stat -f %m "$COUNTER_FILE" 2>/dev/null)
+    AGE=$((CURRENT_TIME - FILE_TIME))
+
+    # Reset if older than 2 minutes (120 seconds)
+    if [ "$AGE" -gt 120 ]; then
+        COUNTER=0
+    else
+        COUNTER=$(cat "$COUNTER_FILE")
+    fi
+else
+    COUNTER=0
+fi
+
+# Increment counter
+COUNTER=$((COUNTER + 1))
+echo "$COUNTER" > "$COUNTER_FILE"
+
+# Generate filename with counter and timestamp for uniqueness
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+TEMP_FILE="${TEMP_DIR}/image_${COUNTER}_${TIMESTAMP}.png"
+
+# Convert WSL path to Windows path for PowerShell
+WIN_PATH=$(wslpath -w "$TEMP_FILE")
+
+# PowerShell command to check clipboard and save image
+POWERSHELL_CMD="
+\$image = Get-Clipboard -Format Image
+if (\$image) {
+    try {
+        \$image.Save('$WIN_PATH', [System.Drawing.Imaging.ImageFormat]::Png)
+        Write-Host 'SUCCESS'
+    } catch {
+        Write-Host 'ERROR: Failed to save image'
+        exit 1
+    }
+} else {
+    Write-Host 'NONE'
+}
+"
+
+# Execute PowerShell command
+RESULT=$(powershell.exe -Command "$POWERSHELL_CMD" 2>&1 | tr -d '\r')
+
+case "$RESULT" in
+    SUCCESS)
+        # Output just the path so Claude Code can read it
+        echo "$TEMP_FILE"
+        ;;
+    NONE)
+        # Decrement counter since no image was pasted
+        COUNTER=$((COUNTER - 1))
+        echo "$COUNTER" > "$COUNTER_FILE"
+        exit 1
+        ;;
+    *)
+        # Decrement counter on error
+        COUNTER=$((COUNTER - 1))
+        echo "$COUNTER" > "$COUNTER_FILE"
+
+        echo "Error: $RESULT" >&2
+        exit 1
+        ;;
+esac

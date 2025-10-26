@@ -1,0 +1,55 @@
+{
+  "name": "claude-clipboard",
+  "version": "1.0.0",
+  "description": "Smart clipboard integration for Claude Code - paste screenshots and images directly from clipboard",
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "main": "index.js",
+  "bin": {
+    "claude-clipboard": "bin/claude-clipboard.js"
+  },
+  "scripts": {
+    "test": "vitest --bail 1",
+    "test:run": "vitest run --bail 1",
+    "push": "./scripts/push.sh",
+    "release": "./scripts/release.sh",
+    "release:patch": "./scripts/release.sh patch",
+    "release:minor": "./scripts/release.sh minor",
+    "release:major": "./scripts/release.sh major"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fullstacktard/claude-clipboard.git"
+  },
+  "keywords": [
+    "claude",
+    "claude-code",
+    "clipboard",
+    "screenshot",
+    "paste",
+    "autohotkey",
+    "wsl",
+    "windows",
+    "image-paste",
+    "productivity"
+  ],
+  "author": "fullstacktard",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fullstacktard/claude-clipboard/issues"
+  },
+  "homepage": "https://github.com/fullstacktard/claude-clipboard#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "boxen": "^8.0.1",
+    "chalk": "^5.3.0",
+    "ora": "^9.0.0"
+  },
+  "devDependencies": {
+    "vitest": "^1.2.0"
+  }
+}

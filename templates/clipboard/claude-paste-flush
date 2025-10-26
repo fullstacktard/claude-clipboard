@@ -1,0 +1,27 @@
+#!/bin/bash
+# Output all staged images and clear staging area
+
+STAGING_DIR="${HOME}/.cache/claude-clipboard-staging"
+
+# Check if staging directory exists and has images
+if [ ! -d "$STAGING_DIR" ]; then
+    echo "No images staged. Use Ctrl+Shift+S to stage images first." >&2
+    exit 1
+fi
+
+IMAGES=($(ls -1 "$STAGING_DIR"/staged_*.png 2>/dev/null))
+
+if [ ${#IMAGES[@]} -eq 0 ]; then
+    echo "No images staged. Take screenshots and press Ctrl+Shift+S to stage them." >&2
+    exit 1
+fi
+
+# Output all image paths (one per line, which Claude Code will see)
+echo "📋 Pasting ${#IMAGES[@]} staged images:" >&2
+for img in "${IMAGES[@]}"; do
+    echo "$img"
+done
+
+# Clear staging area
+rm -f "$STAGING_DIR"/staged_*.png
+echo "✓ Staging area cleared" >&2

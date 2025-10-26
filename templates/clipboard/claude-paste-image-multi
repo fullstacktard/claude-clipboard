@@ -1,0 +1,103 @@
+#!/bin/bash
+# Claude Code WSL Multi-Image Clipboard Paste Script
+# Handles both single images and multiple file drops from clipboard
+
+# Create temp directory if it doesn't exist
+TEMP_DIR="${HOME}/.cache/claude-clipboard-images"
+mkdir -p "$TEMP_DIR"
+
+# PowerShell script to check clipboard formats and handle appropriately
+POWERSHELL_CMD='
+Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
+
+# Check for FileDropList first (multiple files copied from Explorer)
+try {
+    $files = Get-Clipboard -Format FileDropList -ErrorAction Stop
+    if ($files -and $files.Count -gt 0) {
+        Write-Host "FILEDROPLIST"
+        foreach ($file in $files) {
+            # Only include image files
+            if ($file -match "\.(png|jpg|jpeg|gif|bmp|webp|svg)$") {
+                Write-Host $file
+            }
+        }
+        exit 0
+    }
+} catch {}
+
+# Check for single image data
+try {
+    $img = Get-Clipboard -Format Image -ErrorAction Stop
+    if ($img) {
+        Write-Host "IMAGE"
+        exit 0
+    }
+} catch {}
+
+# No image data found
+Write-Host "NONE"
+'
+
+# Execute PowerShell command
+RESULT=$(powershell.exe -Command "$POWERSHELL_CMD" 2>&1 | tr -d '\r')
+
+# Parse the result
+FIRST_LINE=$(echo "$RESULT" | head -1)
+
+case "$FIRST_LINE" in
+    FILEDROPLIST)
+        # Multiple files - convert Windows paths to WSL paths
+        echo "$RESULT" | tail -n +2 | while IFS= read -r win_path; do
+            if [ -n "$win_path" ]; then
+                # Convert to WSL path
+                wsl_path=$(wslpath "$win_path" 2>/dev/null)
+                if [ -f "$wsl_path" ]; then
+                    echo "$wsl_path"
+                fi
+            fi
+        done
+        ;;
+
+    IMAGE)
+        # Single image - save it
+        TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+        TEMP_FILE="${TEMP_DIR}/clipboard_${TIMESTAMP}.png"
+        WIN_PATH=$(wslpath -w "$TEMP_FILE")
+
+        SAVE_CMD="
+        \$image = Get-Clipboard -Format Image
+        if (\$image) {
+            try {
+                \$image.Save('$WIN_PATH', [System.Drawing.Imaging.ImageFormat]::Png)
+                Write-Host 'SUCCESS'
+            } catch {
+                Write-Host 'ERROR'
+            }
+        }
+        "
+
+        SAVE_RESULT=$(powershell.exe -Command "$SAVE_CMD" 2>&1 | tr -d '\r')
+
+        if [[ "$SAVE_RESULT" == "SUCCESS" ]] && [ -f "$TEMP_FILE" ]; then
+            echo "$TEMP_FILE"
+        else
+            echo "Error: Failed to save image" >&2
+            exit 1
+        fi
+        ;;
+
+    NONE)
+        # Try text clipboard as fallback
+        TEXT=$(powershell.exe -Command "Get-Clipboard" 2>/dev/null | tr -d '\r')
+        if [ -n "$TEXT" ]; then
+            echo "$TEXT"
+        fi
+        exit 1
+        ;;
+
+    *)
+        echo "Error: Unknown clipboard state" >&2
+        exit 1
+        ;;
+esac

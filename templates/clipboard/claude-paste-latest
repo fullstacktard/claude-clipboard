@@ -1,0 +1,42 @@
+#!/bin/bash
+# Save clipboard image to a FIXED path for easy keyboard shortcut access
+
+TEMP_DIR="${HOME}/.cache/claude-clipboard-images"
+mkdir -p "$TEMP_DIR"
+
+# Always use the same filename - gets overwritten each time
+TEMP_FILE="${TEMP_DIR}/latest.png"
+WIN_PATH=$(wslpath -w "$TEMP_FILE")
+
+# PowerShell command to check clipboard and save image
+POWERSHELL_CMD="
+\$image = Get-Clipboard -Format Image
+if (\$image) {
+    try {
+        \$image.Save('$WIN_PATH', [System.Drawing.Imaging.ImageFormat]::Png)
+        Write-Host 'SUCCESS'
+    } catch {
+        Write-Host 'ERROR: Failed to save image'
+        exit 1
+    }
+} else {
+    Write-Host 'NONE'
+}
+"
+
+# Execute PowerShell command
+RESULT=$(powershell.exe -Command "$POWERSHELL_CMD" 2>&1 | tr -d '\r')
+
+case "$RESULT" in
+    SUCCESS)
+        echo "$TEMP_FILE"
+        ;;
+    NONE)
+        echo "No image in clipboard" >&2
+        exit 1
+        ;;
+    *)
+        echo "Error: $RESULT" >&2
+        exit 1
+        ;;
+esac
