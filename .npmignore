@@ -1,0 +1,17 @@
+tests/
+.git/
+.github/
+.vscode/
+.idea/
+*.log
+.DS_Store
+coverage/
+.cache/
+demo.gif
+demo.tape
+backlog/
+docs/development/
+WORKFLOW.md
+TASK_SUMMARY.md
+TESTING_STRATEGY.md
+.claude/

@@ -1,0 +1,27 @@
+#!/bin/bash
+# Claude Code Clipboard Hook
+# This hook automatically includes clipboard images when you submit messages
+
+# Check if clipboard has an image
+TEMP_DIR="${HOME}/.cache/claude-clipboard-images"
+mkdir -p "$TEMP_DIR"
+
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+TEMP_FILE="${TEMP_DIR}/clipboard_${TIMESTAMP}.png"
+WIN_PATH=$(wslpath -w "$TEMP_FILE")
+
+# Quick check if clipboard has image
+HAS_IMAGE=$(powershell.exe -Command "if (Get-Clipboard -Format Image) { Write-Host '1' } else { Write-Host '0' }" 2>/dev/null | tr -d '\r\n')
+
+if [ "$HAS_IMAGE" = "1" ]; then
+    # Save the image
+    powershell.exe -Command "(Get-Clipboard -Format Image).Save('$WIN_PATH', [System.Drawing.Imaging.ImageFormat]::Png)" 2>/dev/null
+
+    if [ -f "$TEMP_FILE" ]; then
+        # Create a marker file that Claude Code can detect
+        echo "$TEMP_FILE" > "${TEMP_DIR}/.last_clipboard_image"
+        echo "[Clipboard image saved: $TEMP_FILE]" >&2
+    fi
+fi
+
+exit 0
