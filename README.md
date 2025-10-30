@@ -19,11 +19,14 @@ npm install -g claude-clipboard
 claude-clipboard install
 ```
 
-The installer will:
-- Copy clipboard scripts to `~/.local/share/claude-clipboard/`
-- Copy AutoHotkey script to Windows `AppData` directory
-- Check for AutoHotkey v2
-- Provide setup instructions
+The installer automatically:
+- Copies clipboard scripts to `~/.local/share/claude-clipboard/`
+- Copies AutoHotkey scripts to Windows `AppData` directory
+- Installs AutoHotkey v2 (if not already installed)
+- Starts the clipboard monitor
+- Configures auto-start on Windows login
+
+That's it! No prompts, no manual steps. Just run and go.
 
 ## Requirements
 
@@ -32,13 +35,20 @@ The installer will:
 - **AutoHotkey v2** - [Download here](https://www.autohotkey.com/)
 - **Node.js** 18 or higher
 
-## After Installation
+## Usage
 
-### 1. Install AutoHotkey v2 (if not already installed)
+After installation, just:
+1. Take screenshot (Win+Shift+S)
+2. Press Ctrl+V in Claude Code
+3. Screenshot path appears automatically!
 
-Download and install from: https://www.autohotkey.com/
+The clipboard monitor is already running and will start automatically on Windows login.
 
-### 2. Start the Clipboard Monitor
+## Manual Control
+
+If you need to manually control the clipboard monitor:
+
+### Start the Clipboard Monitor
 
 **In Windows PowerShell:**
 
@@ -47,26 +57,14 @@ cd "$env:LOCALAPPDATA\claude-clipboard"
 .\start-smart-paste.ps1
 ```
 
-You should see:
-```
-Smart Ctrl+V paste system started!
-You can now:
-  1. Take screenshot (Win+Shift+S)
-  2. Press Ctrl+V in Claude Code
-  3. Screenshot appears!
-  4. Repeat for more screenshots
-```
+### Configure Auto-start on Windows Login
 
-### 3. Optional: Auto-start on Windows Login
-
-**In Windows PowerShell (as Administrator):**
+**In Windows PowerShell:**
 
 ```powershell
 cd "$env:LOCALAPPDATA\claude-clipboard"
 .\start-paste-shortcut.ps1
 ```
-
-This creates a startup shortcut so the clipboard monitor starts automatically when you log in.
 
 ## How It Works
 
