@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import chalk from "chalk";
 import { showError } from "../lib/ui.js";
 import { install } from "../lib/commands/install.js";
 
@@ -17,18 +18,19 @@ async function main() {
       case "--help":
       case "-h":
         console.log(`
-Claude Clipboard - Smart clipboard paste for Claude Code
+${chalk.red.bold("Claude Clipboard")} ${chalk.white("- Smart clipboard paste for Claude Code")}
 
-Usage:
-  claude-clipboard [install]  Install the clipboard integration
-  claude-clipboard help       Show this help message
+${chalk.red.bold("Usage:")}
+  ${chalk.white("claude-clipboard")} ${chalk.gray("[install]")}  ${chalk.dim("Install the clipboard integration")}
+  ${chalk.white("claude-clipboard install")}    ${chalk.dim("Install the clipboard integration")}
+  ${chalk.white("claude-clipboard help")}       ${chalk.dim("Show this help message")}
 
-Examples:
-  claude-clipboard            # Install (default action)
-  claude-clipboard install    # Explicitly install
+${chalk.red.bold("Examples:")}
+  ${chalk.white("claude-clipboard")}            ${chalk.dim("# Install (default action)")}
+  ${chalk.white("claude-clipboard install")}    ${chalk.dim("# Explicitly install")}
 
-For more information, visit:
-  https://github.com/fullstacktard/claude-clipboard
+${chalk.red.bold("For more information, visit:")}
+  ${chalk.cyan("https://github.com/fullstacktard/claude-clipboard")}
 `);
         break;
       default:
