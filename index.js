@@ -9,5 +9,7 @@ export {
   showBox,
   showSection,
   createSpinner,
-  emojis,
+  brandGradient,
+  successGradient,
+  infoGradient,
 } from "./lib/ui.js";

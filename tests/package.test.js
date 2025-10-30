@@ -87,6 +87,8 @@ describe("Module Exports", () => {
     expect(ui.showWarning).toBeDefined();
     expect(ui.showInfo).toBeDefined();
     expect(ui.createSpinner).toBeDefined();
-    expect(ui.emojis).toBeDefined();
+    expect(ui.brandGradient).toBeDefined();
+    expect(ui.successGradient).toBeDefined();
+    expect(ui.infoGradient).toBeDefined();
   });
 });
