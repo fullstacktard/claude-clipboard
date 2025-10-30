@@ -1,6 +1,6 @@
 {
   "name": "claude-clipboard",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Smart clipboard integration for Claude Code - paste screenshots and images directly from clipboard",
   "publishConfig": {
     "access": "public"
