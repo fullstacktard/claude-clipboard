@@ -1,258 +1,46 @@
-# Claude Clipboard
+# claude-clipboard
 
-**Smart clipboard integration for Claude Code - paste screenshots and images directly from clipboard**
+**stop manually saving screenshots. just hit Ctrl+V and the path appears in Claude Code.**
 
-Stop manually saving screenshots! Just press Ctrl+V and Claude Clipboard automatically saves and pastes the image path into Claude Code.
+![Demo](https://vhs.charm.sh/vhs-6HA3PYFYbXEIN4hp5WdaWw.gif)
 
-## What You Get
+sick of doing Win+Shift+S, then Save As, then typing the path? me too. this intercepts Ctrl+V in Windows Terminal, auto-saves your clipboard screenshot to WSL, and pastes the path into Claude Code.
 
-**Quick Usage:**
-1. Take screenshot (Win+Shift+S)
-2. Press Ctrl+V in Claude Code
-3. Screenshot path appears automatically!
-4. Repeat for more screenshots
+## what this does
 
-## Installation
+- **Win+Shift+S** to screenshot
+- **Ctrl+V** in Claude Code
+- screenshot path appears automatically
+- **images saved** to `~/.cache/claude-clipboard-images/`
+
+basically: no more Save As dialog hell. paste screenshots like you paste text.
+
+## installation
 
 ```bash
 npm install -g claude-clipboard
 claude-clipboard install
 ```
 
-The installer automatically:
-- Copies clipboard scripts to `~/.local/share/claude-clipboard/`
-- Copies AutoHotkey scripts to Windows `AppData` directory
-- Installs AutoHotkey v2 (if not already installed)
-- Starts the clipboard monitor
-- Configures auto-start on Windows login
+that's it. installer sets up AutoHotkey scripts on Windows, bash scripts in WSL, and starts the clipboard monitor. auto-starts on Windows login.
 
-That's it! No prompts, no manual steps. Just run and go.
+## requirements
 
-## Requirements
+- Windows Terminal + WSL (Ubuntu/Debian)
+- Claude Code installed
+- Node.js 18+
+- AutoHotkey v2 (installer handles this)
 
-- **Windows** with **WSL** (Ubuntu/Debian)
-- **Windows Terminal** or Ubuntu.exe
-- **AutoHotkey v2** - [Download here](https://www.autohotkey.com/)
-- **Node.js** 18 or higher
+if you're not using Windows Terminal or Ubuntu.exe, this won't work. PRs welcome but I use Windows Terminal.
 
-## Usage
+## troubleshooting
 
-After installation, just:
-1. Take screenshot (Win+Shift+S)
-2. Press Ctrl+V in Claude Code
-3. Screenshot path appears automatically!
+if something's not working, check [the troubleshooting guide](https://github.com/fullstacktard/claude-clipboard-public#readme).
 
-The clipboard monitor is already running and will start automatically on Windows login.
-
-## Manual Control
-
-If you need to manually control the clipboard monitor:
-
-### Start the Clipboard Monitor
-
-**In Windows PowerShell:**
-
-```powershell
-cd "$env:LOCALAPPDATA\claude-clipboard"
-.\start-smart-paste.ps1
-```
-
-### Configure Auto-start on Windows Login
-
-**In Windows PowerShell:**
-
-```powershell
-cd "$env:LOCALAPPDATA\claude-clipboard"
-.\start-paste-shortcut.ps1
-```
-
-## How It Works
-
-1. **Screenshot Capture** - Use Windows Snipping Tool (Win+Shift+S) to capture
-2. **Clipboard Detection** - AutoHotkey script monitors Ctrl+V in Windows Terminal
-3. **Image Processing** - WSL bash script saves clipboard image to `~/.cache/claude-clipboard-images/`
-4. **Auto-Paste** - Script types the file path into Claude Code
-
-**Technical Flow:**
-- `claude-smart-paste.ahk` (Windows) - Intercepts Ctrl+V
-- `claude-paste-image` (WSL) - Saves image and returns path
-- Images stored: `~/.cache/claude-clipboard-images/`
-
-## Commands
-
-The installation includes several clipboard utilities:
-
-### `claude-paste-image`
-Main command - saves clipboard image and returns path.
-
-```bash
-claude-paste-image
-# Output: /home/user/.cache/claude-clipboard-images/image_1_20251026_123045.png
-```
-
-### `claude-paste-latest`
-Paste the most recent image again.
-
-```bash
-claude-paste-latest
-# Output: /home/user/.cache/claude-clipboard-images/image_1_20251026_123045.png
-```
-
-### `claude-paste-clear`
-Clear all saved images.
-
-```bash
-claude-paste-clear
-# Cleared 5 images
-```
-
-### `claude-paste-flush`
-Reset image counter (starts counting from 1 again).
-
-```bash
-claude-paste-flush
-# Counter flushed, next image will be image_1
-```
-
-## Troubleshooting
-
-### Script Not Intercepting Ctrl+V
-
-**Check if AutoHotkey is running:**
-```powershell
-Get-Process | Where-Object {$_.ProcessName -like "*AutoHotkey*"}
-```
-
-**Restart the script:**
-```powershell
-cd "$env:LOCALAPPDATA\claude-clipboard"
-.\start-smart-paste.ps1
-```
-
-### Images Not Pasting
-
-**Test the bash script manually:**
-```bash
-# Copy an image to clipboard first (Win+Shift+S)
-~/.local/share/claude-clipboard/claude-paste-image
-# Should output a file path
-```
-
-**Check image directory:**
-```bash
-ls -lah ~/.cache/claude-clipboard-images/
-```
-
-### Wrong Window Active
-
-The script only works in **Windows Terminal** or **Ubuntu.exe**. Make sure your terminal is focused when pressing Ctrl+V.
-
-### PowerShell Execution Policy Error
-
-If you get an execution policy error, run this in PowerShell (as Administrator):
-
-```powershell
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-```
-
-## Files & Locations
-
-### WSL Files
-
-| Path | Purpose |
-|------|---------|
-| `~/.local/share/claude-clipboard/` | Installation directory |
-| `~/.cache/claude-clipboard-images/` | Saved screenshots |
-| `~/.cache/claude-clipboard-images/.image_counter` | Session tracking |
-
-### Windows Files
-
-| Path | Purpose |
-|------|---------|
-| `%LOCALAPPDATA%\claude-clipboard\` | Windows installation |
-| `claude-smart-paste.ahk` | AutoHotkey Ctrl+V interceptor |
-| `start-smart-paste.ps1` | PowerShell launcher |
-| `start-paste-shortcut.ps1` | Startup shortcut creator |
-
-## Advanced Usage
-
-### Multiple Screenshots in One Paste
-
-Use `claude-paste-image-multi` for pasting multiple images:
-
-```bash
-# Take 3 screenshots, then:
-~/.local/share/claude-clipboard/claude-paste-image-multi
-# Outputs all images with newlines
-```
-
-### Stage Images for Later
-
-```bash
-# Stage an image without pasting
-~/.local/share/claude-clipboard/claude-paste-stage
-
-# Later, paste the staged image
-~/.local/share/claude-clipboard/claude-paste-latest
-```
-
-### Continuous Clipboard Watching
-
-For watching clipboard continuously (not just Ctrl+V):
-
-```powershell
-# In Windows PowerShell
-$env:LOCALAPPDATA\claude-clipboard\clipboard-watcher.ps1
-```
-
-This monitors the clipboard and automatically saves images as they're copied.
-
-## Uninstall
-
-```bash
-# 1. Stop AutoHotkey script (close from system tray)
-
-# 2. Remove WSL files
-rm -rf ~/.local/share/claude-clipboard
-rm -rf ~/.cache/claude-clipboard-images
-
-# 3. Remove Windows files (in PowerShell)
-Remove-Item -Recurse -Force "$env:LOCALAPPDATA\claude-clipboard"
-
-# 4. Remove startup shortcut (if created)
-Remove-Item "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\Claude-Clipboard-Paste.lnk"
-```
-
-## Customization
-
-### Change Image Save Location
-
-Edit `~/.local/share/claude-clipboard/claude-paste-image`:
-
-```bash
-IMAGE_DIR="$HOME/.cache/my-custom-location"
-```
-
-### Change Image Naming Pattern
-
-Edit the same file and modify the `IMAGE_PATH` line:
-
-```bash
-IMAGE_PATH="${IMAGE_DIR}/screenshot_${IMAGE_NUM}_${TIMESTAMP}.png"
-```
-
-## Security Note
-
-Images are saved to your local WSL filesystem (`~/.cache/claude-clipboard-images/`). They are NOT uploaded anywhere automatically. Claude Code may send them to Anthropic when you submit them in a conversation, following Claude's normal data handling policies.
-
-## License
+## license
 
 MIT
 
-## Author
+---
 
-Built by [@fullstacktard](https://github.com/fullstacktard) - because saving screenshots manually is for chumps.
-
-## Related
-
-- [claude-workflow](https://www.npmjs.com/package/claude-workflow) - Workflow management for Claude Code
+*built by [@fullstacktard](https://github.com/fullstacktard) because Save As dialogs are productivity cancer*
