@@ -2,7 +2,7 @@
 
 **stop manually saving screenshots. just hit Ctrl+V and the path appears in Claude Code.**
 
-![Demo](https://vhs.charm.sh/vhs-6biofzV2aFbIUcCh8iHGsY.gif)
+![Demo](https://vhs.charm.sh/vhs-5wniOlyAvDxOgJGZ8jWmDz.gif)
 
 sick of doing Win+Shift+S, then Save As, then typing the path? me too. this intercepts Ctrl+V in Windows Terminal, auto-saves your clipboard screenshot to WSL, and pastes the path into Claude Code.
 
